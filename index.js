@@ -55,7 +55,7 @@ app.get('/shopify/callback', (req, res)=>{
 })
 
 app.get('/options', (req, res) => {
-    res.send("test")
+    res.send(req.query)
 })
 
 app.listen(port, ()=>{
