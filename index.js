@@ -55,7 +55,19 @@ app.get('/shopify/callback', (req, res)=>{
 })
 
 app.get('/options', (req, res) => {
-    res.send(req.query)
+    let { shop } = req.query;
+
+    const accessTokenRequestUrl = `https://${shop}/admin/oauth/access_token`;
+    const accessTokenPayload = {
+        client_id: api_key,
+        client_secret: api_secret,
+    }
+
+    request.post(accessTokenRequestUrl, {json: accessTokenPayload})
+        .then((acc_token) =>{
+            let {access_token} = acc_token
+            res.send(access_token)
+        })
 })
 
 app.listen(port, ()=>{
