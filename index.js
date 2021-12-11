@@ -5,14 +5,17 @@ const cookie = require('cookie');
 const nonce = require('nonce')();
 const querystring = require('querystring');
 const request = require('request-promise');
+const cors = require('cors');
 
 const app = express();
+app.use(cors());
 const port = process.env.PORT || 8081;
 
 const api_key = process.env.SHOPIFY_API_KEY;
 const api_secret = process.env.SHOPIFY_API_SECRET;
 const scopes = process.env.SCOPES;
 const host = process.env.HOST;
+let codes;
 
 app.get('/shopify', (req, res) => {
     // console.log(req)
@@ -34,6 +37,7 @@ app.get('/shopify', (req, res) => {
 
 app.get('/shopify/callback', (req, res)=>{
     const { shop, hmac, code, state } = req.query;
+    codes = code
     const state_cookie = cookie.parse(req.headers.cookie).state;
 
     if(state !== state_cookie){
@@ -49,25 +53,29 @@ app.get('/shopify/callback', (req, res)=>{
         if(generatedHash !== hmac){
             return res.status(400).send("hmac validation failed");
         }
+
     }
 
     res.status(200).send('HMAC validated');
 })
 
 app.get('/options', (req, res) => {
-    let { shop } = req.query;
+    // let { shop, signature } = req.query;
+    // console.log(codes)
+    // const accessTokenRequestUrl = `https://${shop}/admin/oauth/access_token`;
+    // const accessTokenPayload = {
+    //     client_id: api_key,
+    //     client_secret: api_secret,
+    //     code : codes
+    // }
 
-    const accessTokenRequestUrl = `https://${shop}/admin/oauth/access_token`;
-    const accessTokenPayload = {
-        client_id: api_key,
-        client_secret: api_secret,
-    }
+    // request.post(accessTokenRequestUrl, {json: accessTokenPayload})
+    //     .then((acc_token) =>{
+    //         let {access_token} = acc_token
+    //         res.send(access_token)
+    //     })
 
-    request.post(accessTokenRequestUrl, {json: accessTokenPayload})
-        .then((acc_token) =>{
-            let {access_token} = acc_token
-            res.send(access_token)
-        })
+    res.send("test")
 })
 
 app.listen(port, ()=>{
